@@ -1,0 +1,9 @@
+{
+  "name": "snakes",
+  "version": "0.0.1",
+  "description": "Snakes Game",
+  "main": "index.js",
+  "author": "patrick.simmelbauer@gmail.com",
+  "license": "MIT",
+  "private": false
+}
