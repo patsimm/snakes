@@ -11,6 +11,10 @@ app.get('/game.js', (req, res) => {
   res.sendFile(path.join(__dirname, '..', '..', 'dist', 'game.js'))
 })
 
+app.get('/assets/css/main.css', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', '..', 'dist', 'assets', 'css', 'client.css'))
+})
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '..', '..', 'public', 'index.html'))
 })
