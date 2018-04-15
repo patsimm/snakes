@@ -2,19 +2,18 @@ const gameState = require('../../game/state')
 
 const area = {
   /**
-   * @param {HTMLCanvasElement} canvas
+   * @param {CanvasRenderingContext2D} ctx
    * @param {*} state
    */
-  drawArea: (canvas, state) => {
-    const ctx = canvas.getContext('2d')
+  drawArea: (ctx, state) => {
     const cellDimensions = {
-      width: canvas.width / state.area.width,
-      height: canvas.height / state.area.width
+      width: ctx.canvas.width / state.area.width,
+      height: ctx.canvas.height / state.area.width
     }
 
     ctx.strokeStyle = '#303030'
     ctx.fillStyle = '#e3e3e3'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     area.walkGrid(state, coordinates => {
       area.drawCell(ctx, cellDimensions, state, coordinates)
     })

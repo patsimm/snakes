@@ -1,5 +1,4 @@
-const { getNextCoordinate } = require('./actions.helper')
-const { getSnakeById } = require('../state')
+const { getNextCoordinate, getSnakeById } = require('../state')
 
 const actions = {
   changeSnakeDirection: function(state, snakeId, direction) {
@@ -18,7 +17,7 @@ const actions = {
     newState.snakes[snakeIndex] = { ...snake, parts: [...state.snakes[snakeIndex].parts] }
     const newParts = newState.snakes[snakeIndex].parts
     newParts.pop()
-    newParts.unshift(getNextCoordinate(newParts[0], snake.direction))
+    newParts.unshift(getNextCoordinate(state, newParts[0], snake.direction))
     return newState
   }
 }

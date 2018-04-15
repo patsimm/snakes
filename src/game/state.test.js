@@ -47,4 +47,63 @@ describe('state', () => {
       expect(result.snake).toBeUndefined()
     })
   })
+
+  describe('getNextCoordinate()', () => {
+    it('should return undefined if false direction is given', () => {
+      const result = state.getNextCoordinate(testState, { x: 1, y: 1 }, 'bla')
+      expect(result).toBeUndefined()
+    })
+
+    const testCoordinates = [{ x: 1, y: 1 }, { x: 2, y: 2 }, { x: 18, y: 12 }]
+    const expectedCoordinates = {
+      north: [{ x: 1, y: 0 }, { x: 2, y: 1 }, { x: 18, y: 11 }],
+      east: [{ x: 2, y: 1 }, { x: 3, y: 2 }, { x: 19, y: 12 }],
+      south: [{ x: 1, y: 2 }, { x: 2, y: 3 }, { x: 18, y: 13 }],
+      west: [{ x: 0, y: 1 }, { x: 1, y: 2 }, { x: 17, y: 12 }]
+    }
+
+    Object.keys(expectedCoordinates).forEach(key => {
+      describe(`${key}`, () => {
+        const expected = expectedCoordinates[key]
+        testCoordinates.forEach((coord, index) => {
+          it(`should return coordinate to the ${key} of ${JSON.stringify(coord)}`, () => {
+            const result = state.getNextCoordinate(testState, coord, key)
+            expect(result).toEqual(expected[index])
+          })
+        })
+      })
+    })
+
+    describe('over the edge', () => {
+      const testCoordinates = [{ x: 0, y: 1 }, { x: 19, y: 2 }, { x: 5, y: 19 }, { x: 3, y: 0 }]
+      const expectedCoordinates = {
+        north: [{ x: 0, y: 0 }, { x: 19, y: 1 }, { x: 5, y: 18 }, { x: 3, y: 19 }],
+        east: [{ x: 1, y: 1 }, { x: 0, y: 2 }, { x: 6, y: 19 }, { x: 4, y: 0 }],
+        south: [{ x: 0, y: 2 }, { x: 19, y: 3 }, { x: 5, y: 0 }, { x: 3, y: 1 }],
+        west: [{ x: 19, y: 1 }, { x: 18, y: 2 }, { x: 4, y: 19 }, { x: 2, y: 0 }]
+      }
+
+      Object.keys(expectedCoordinates).forEach(key => {
+        describe(`${key}`, () => {
+          const expected = expectedCoordinates[key]
+          testCoordinates.forEach((coord, index) => {
+            it(`should return coordinate to the ${key} of ${JSON.stringify(coord)}`, () => {
+              const result = state.getNextCoordinate(testState, coord, key)
+              expect(result).toEqual(expected[index])
+            })
+          })
+        })
+      })
+    })
+
+    describe('coordinates not in range', () => {
+      const testCoordinates = [{ x: -1, y: 1 }, { x: 23, y: 2 }, { x: 5, y: -2 }, { x: 3, y: 20 }]
+      testCoordinates.forEach(coordinate => {
+        it(`should return undefined when given ${JSON.stringify(coordinate)}`, () => {
+          const result = state.getNextCoordinate(testState, coordinate, 'north')
+          expect(result).toBeUndefined()
+        })
+      })
+    })
+  })
 })
