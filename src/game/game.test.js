@@ -1,29 +1,32 @@
 const game = require('./game')
+const gameEvents = require('./events')
+
+jest.useFakeTimers()
 
 describe('game', () => {
-  const fakeDiv = document.createElement('div')
-  let getElementByIdSpy
+  describe('loop()', () => {
+    it('should call setTimeout', () => {
+      game.loop()
+      expect(setTimeout).toHaveBeenCalled()
+    })
 
-  let io
-  beforeAll(() => {
-    io = require('socket.io').listen(4000)
+    it('should call setTimeout with itself as callback and a time of 1000', () => {
+      game.loop()
+      expect(setTimeout).toHaveBeenCalledWith(game.loop, 1000)
+    })
+
+    it('should call tick', () => {
+      const tickSpy = spyOn(game, 'tick').and.stub()
+      game.loop()
+      expect(tickSpy).toHaveBeenCalled()
+    })
   })
 
-  afterAll(() => {
-    io.close()
-  })
-
-  beforeEach(() => {
-    getElementByIdSpy = spyOn(document, 'getElementById').and.returnValue(fakeDiv)
-  })
-
-  it('should get element #app', () => {
-    game()
-    expect(getElementByIdSpy).toHaveBeenCalledWith('app')
-  })
-
-  it('should set elements innerHTML', () => {
-    game()
-    expect(fakeDiv.innerHTML).toBe('Hello World')
+  describe('tick()', () => {
+    it('should flush queue', () => {
+      const flushSpy = spyOn(gameEvents, 'flushEvents')
+      game.tick()
+      expect(flushSpy).toHaveBeenCalled()
+    })
   })
 })
