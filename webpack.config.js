@@ -4,8 +4,8 @@ const path = require('path')
 
 module.exports = {
   mode: process.env.NODE_ENV,
-  context: path.resolve(__dirname, 'src', 'game'),
-  entry: path.resolve(__dirname, 'src', 'game', 'index.js'),
+  context: path.resolve(__dirname, 'src', 'client'),
+  entry: path.resolve(__dirname, 'src', 'client', 'index.js'),
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'game.js'
