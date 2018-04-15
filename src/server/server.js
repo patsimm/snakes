@@ -2,9 +2,15 @@ const path = require('path')
 const app = require('express')()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
+const game = require('../game/game')
+const testState = require('../game/test-state')
+
+game.startGame(testState, state => {
+  io.sockets.emit('tick', state)
+})
 
 io.sockets.on('connection', socket => {
-  socket.send('connect')
+  socket.emit('connect', testState)
 })
 
 app.get('/game.js', (req, res) => {

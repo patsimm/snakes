@@ -7,24 +7,14 @@ describe('area', () => {
   const ctx = canvas.getContext('2d')
   let getContextSpy
 
-  beforeEach(() => {
-    getContextSpy = spyOn(canvas, 'getContext').and.returnValue(ctx)
-  })
-
   describe('drawArea', () => {
     it('should not fail', () => {
-      area.drawArea(canvas, testState)
-    })
-
-    it('should get 2d context from canvas', () => {
-      area.drawArea(canvas, testState)
-      expect(getContextSpy).toHaveBeenCalledTimes(1)
-      expect(getContextSpy).toHaveBeenCalledWith('2d')
+      area.drawArea(ctx, testState)
     })
 
     it('should call walkGrid', () => {
       const walkGridSpy = spyOn(area, 'walkGrid')
-      area.drawArea(canvas, testState)
+      area.drawArea(ctx, testState)
       expect(walkGridSpy).toHaveBeenCalled()
     })
 
@@ -32,7 +22,7 @@ describe('area', () => {
       let callback
       beforeEach(() => {
         const walkGridSpy = spyOn(area, 'walkGrid')
-        area.drawArea(canvas, testState)
+        area.drawArea(ctx, testState)
         callback = walkGridSpy.calls.mostRecent().args[1]
       })
 

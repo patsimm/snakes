@@ -5,6 +5,7 @@ const testState = require('../game/test-state')
 describe('client', () => {
   const fakeDiv = document.createElement('div')
   const fakeCanvas = document.createElement('canvas')
+  const fakeCtx = fakeCanvas.getContext('2d')
   let drawAreaSpy
   let getContextSpy
   let getElementByIdSpy
@@ -23,6 +24,7 @@ describe('client', () => {
     drawAreaSpy = spyOn(area, 'drawArea').and.stub()
     getElementByIdSpy = spyOn(document, 'getElementById').and.returnValue(fakeDiv)
     createElementSpy = spyOn(document, 'createElement').and.returnValue(fakeCanvas)
+    getContextSpy = spyOn(fakeCanvas, 'getContext').and.returnValue(fakeCtx)
   })
 
   it('should get element #app', () => {
@@ -45,10 +47,5 @@ describe('client', () => {
     const appendChildSpy = spyOn(fakeDiv, 'appendChild')
     client()
     expect(appendChildSpy).toHaveBeenCalledWith(fakeCanvas)
-  })
-
-  it('should draw area on canvas', () => {
-    client()
-    expect(drawAreaSpy).toHaveBeenCalledWith(fakeCanvas, testState)
   })
 })

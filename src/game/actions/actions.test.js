@@ -1,7 +1,6 @@
 const actions = require('./actions')
-const helpers = require('./actions.helper')
 const testState = require('../test-state')
-const { getSnakeById } = require('../state')
+const { getSnakeById, getNextCoordinate } = require('../state')
 
 describe('actions', () => {
   describe('changeSnakeDirection', () => {
@@ -83,7 +82,7 @@ describe('actions', () => {
       const result = actions.moveSnake(testState, 1)
       const resultSnake = getSnakeById(result, 1)
       const resultHead = resultSnake.parts[0]
-      expect(resultHead).toEqual(helpers.getNextCoordinate(headBefore, resultSnake.direction))
+      expect(resultHead).toEqual(getNextCoordinate(testState, headBefore, resultSnake.direction))
     })
   })
 })

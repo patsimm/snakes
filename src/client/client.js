@@ -1,7 +1,5 @@
 // @ts-ignore
 require('./client.scss')
-const testState = require('../game/test-state')
-
 const io = require('socket.io-client')
 const area = require('./draw/area')
 
@@ -14,10 +12,14 @@ const game = () => {
   canvas.height = 500
 
   appDiv.appendChild(canvas)
-  area.drawArea(canvas, testState)
+  const ctx = canvas.getContext('2d')
+
   const socket = io.connect(`:${process.env.PORT}`)
-  socket.on('connect', () => {
-    console.log('connected1')
+  socket.on('connect', args => {
+    console.log('connected')
+  })
+  socket.on('tick', state => {
+    area.drawArea(ctx, state)
   })
 }
 
