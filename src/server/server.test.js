@@ -27,5 +27,13 @@ describe('server', () => {
           .expect('Content-Type', /javascript/)
       })
     })
+
+    describe('GET /assets/css/main.css', () => {
+      it('should return css', () => {
+        return request(server)
+          .get('/assets/css/main.css')
+          .expect('Content-Type', /css/)
+      })
+    })
   })
 })

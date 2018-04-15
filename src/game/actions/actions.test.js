@@ -1,27 +1,8 @@
 const actions = require('./actions')
 const helpers = require('./actions.helper')
+const testState = require('../test-state')
 const { getSnakeById } = require('../state')
 
-const testState = {
-  area: {
-    width: 20,
-    height: 20
-  },
-  snakes: [
-    {
-      id: 1,
-      color: 'red',
-      parts: [{ x: 5, y: 5 }, { x: 6, y: 5 }, { x: 7, y: 5 }],
-      direction: 'north'
-    },
-    {
-      id: 4,
-      color: 'red',
-      parts: [{ x: 4, y: 4 }, { x: 4, y: 5 }, { x: 4, y: 6 }],
-      direction: 'west'
-    }
-  ]
-}
 describe('actions', () => {
   describe('changeSnakeDirection', () => {
     it('should not return same state', () => {
