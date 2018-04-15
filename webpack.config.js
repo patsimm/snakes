@@ -19,5 +19,10 @@ module.exports = {
       }
     ]
   },
-  plugins: [new webpack.EnvironmentPlugin(['NODE_ENV', 'PORT'])]
+  plugins: [
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'development',
+      PORT: 80
+    })
+  ]
 }

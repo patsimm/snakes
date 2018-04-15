@@ -12,7 +12,8 @@
     "test": "yarn test:source && yarn test:socket",
     "test:socket":
       "cross-env PORT=8080 concurrently -k -s first \"yarn start\" \"wait-on http://localhost:8080/ && jest --testPathPattern=socket-test\"",
-    "test:source": "jest --testPathPattern=src"
+    "test:source": "jest --testPathPattern=src",
+    "postinstall": "yarn build"
   },
   "dependencies": {
     "dotenv": "^5.0.1",
