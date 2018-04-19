@@ -1,3 +1,4 @@
+const Immutable = require('immutable')
 const gameState = require('../../game/state')
 
 const area = {
@@ -7,8 +8,8 @@ const area = {
    */
   drawArea: (ctx, state) => {
     const cellDimensions = {
-      width: ctx.canvas.width / state.area.width,
-      height: ctx.canvas.height / state.area.width
+      width: ctx.canvas.width / state.getIn(['area', 'width']),
+      height: ctx.canvas.height / state.getIn(['area', 'height'])
     }
 
     ctx.strokeStyle = '#303030'
@@ -26,8 +27,9 @@ const area = {
    * @param {*} coordinates
    */
   drawCell: function(ctx, cellDimensions, state, coordinates) {
-    const x = cellDimensions.width * coordinates.x
-    const y = cellDimensions.height * coordinates.y
+    const immutableCoordinates = Immutable.fromJS(coordinates)
+    const x = cellDimensions.width * immutableCoordinates.get('x')
+    const y = cellDimensions.height * immutableCoordinates.get('y')
 
     const cellInfo = gameState.getCellInformation(state, coordinates)
     if (cellInfo.isSnake) {
@@ -40,7 +42,8 @@ const area = {
   },
 
   walkGrid: function(state, callback) {
-    const { width, height } = state.area
+    const width = state.getIn(['area', 'width'])
+    const height = state.getIn(['area', 'height'])
     for (let x = 0; x < width; x = x + 1) {
       for (let y = 0; y < height; y = y + 1) {
         callback({ x, y })

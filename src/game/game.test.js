@@ -108,8 +108,8 @@ describe('game', () => {
     it('should call actions.moveSnake() for every snake in state', () => {
       const moveSnakeSpy = spyOn(actions, 'moveSnake').and.returnValue(testState)
       game.performMovements(testState)
-      testState.snakes.forEach(snake => {
-        expect(moveSnakeSpy).toHaveBeenCalledWith(testState, snake.id)
+      testState.get('snakes').forEach(snake => {
+        expect(moveSnakeSpy).toHaveBeenCalledWith(testState, snake.get('id'))
       })
     })
 

@@ -16,14 +16,14 @@
     "build": "webpack",
     "start": "node .",
     "test": "yarn test:source && yarn test:socket",
-    "test:socket":
-      "cross-env PORT=8080 concurrently -k -s first \"yarn start\" \"wait-on http://localhost:8080/ && jest --testPathPattern=socket-test\"",
+    "test:socket": "cross-env PORT=8080 concurrently -k -s first \"yarn start\" \"wait-on http://localhost:8080/ && jest --testPathPattern=socket-test\"",
     "test:source": "jest --testPathPattern=src",
     "postinstall": "yarn build"
   },
   "dependencies": {
     "dotenv": "^5.0.1",
     "express": "^4.16.3",
+    "immutable": "^3.8.2",
     "socket.io": "^2.1.0"
   },
   "devDependencies": {

@@ -6,11 +6,11 @@ const game = require('../game/game')
 const testState = require('../game/test-state')
 
 game.startGame(testState, state => {
-  io.sockets.emit('tick', state)
+  io.sockets.emit('tick', state.toJS())
 })
 
 io.sockets.on('connection', socket => {
-  socket.emit('connect', testState)
+  socket.emit('connect', testState.toJS())
 })
 
 app.get('/game.js', (req, res) => {
