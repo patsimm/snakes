@@ -1,5 +1,6 @@
 // @ts-ignore
 require('./client.scss')
+const Immutable = require('immutable')
 const io = require('socket.io-client')
 const area = require('./draw/area')
 
@@ -19,7 +20,7 @@ const game = () => {
     console.log('connected')
   })
   socket.on('tick', state => {
-    area.drawArea(ctx, state)
+    area.drawArea(ctx, Immutable.fromJS(state))
   })
 }
 

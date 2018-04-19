@@ -35,8 +35,8 @@ describe('area', () => {
       it('should call drawCell() with the right values', () => {
         const drawCellSpy = spyOn(area, 'drawCell')
         const cellDimensions = {
-          width: canvas.width / testState.area.width,
-          height: canvas.height / testState.area.width
+          width: canvas.width / testState.getIn(['area', 'width']),
+          height: canvas.height / testState.getIn(['area', 'height'])
         }
         const coordinates = { x: 0, y: 0 }
         callback(coordinates)
@@ -87,14 +87,16 @@ describe('area', () => {
     it('should call callback width*height times', () => {
       const callback = jest.fn()
       area.walkGrid(testState, callback)
-      expect(callback).toHaveBeenCalledTimes(testState.area.width * testState.area.height)
+      expect(callback).toHaveBeenCalledTimes(
+        testState.getIn(['area', 'width']) * testState.getIn(['area', 'width'])
+      )
     })
 
     it('should call callback with walked coordinates', () => {
       const callback = jest.fn()
       area.walkGrid(testState, callback)
-      for (let x = 0; x < testState.area.width; x++) {
-        for (let y = 0; y < testState.area.width; y++) {
+      for (let x = 0; x < testState.getIn(['area', 'width']); x++) {
+        for (let y = 0; y < testState.getIn(['area', 'height']); y++) {
           expect(callback).toHaveBeenCalledWith({ x, y })
         }
       }

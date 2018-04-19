@@ -21,8 +21,8 @@ const game = {
   },
 
   performMovements: function(state) {
-    state.snakes.forEach(snake => {
-      state = actions.moveSnake(state, snake.id)
+    state.get('snakes').forEach(snake => {
+      state = actions.moveSnake(state, snake.get('id'))
     })
     return state
   }
