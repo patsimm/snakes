@@ -1,22 +1,57 @@
 const EventEmitter = require('events').EventEmitter
-const queue = require('./queue')
+const Rx = require('rxjs')
 
-const events = {
-  _emitter: new EventEmitter(),
+const eventing = stateSubject => {
+  const eventSubject = new Rx.Subject()
+  const eventListenerSubject = new Rx.Subject()
+  const accumulatedListeners = eventListenerSubject
+    .scan((all, current) => {
+      all.push(current)
+      return all
+    }, [])
+    .publish()
 
-  onEvent: function(type, callback) {
-    events._emitter.on(type, args => {
-      callback(args)
-    })
-  },
+  const tickSubject = new Rx.Subject()
+  const tickedEvents = eventSubject
+    .buffer(tickSubject)
+    .withLatestFrom(accumulatedListeners, (events, listeners) => ({ events, listeners }))
+    .publish()
 
-  queueEvent: function(event) {
-    queue.queueEvent(event)
-  },
+  tickedEvents.connect()
+  accumulatedListeners.connect()
 
-  flushEvents: function() {
-    queue.flushEvents(events._emitter.emit)
+  return {
+    onEvent: (eventType, callback) => {
+      eventListenerSubject.next({ type: eventType, callback })
+    },
+
+    queueEvent: event => {
+      eventSubject.next(event)
+    },
+
+    flushEvents: state$ => {
+      tickedEvents
+        .take(1)
+        .withLatestFrom(state$, (data, state) => ({ ...data, state }))
+        .map(data =>
+          data.events.reduce(
+            (eventstate, event) =>
+              data.listeners
+                .filter(listener => listener.type === '*' || listener.type === event.type)
+                .reduce(
+                  (listenerstate, listener) => listener.callback(event, listenerstate),
+                  eventstate
+                ),
+            data.state
+          )
+        )
+        .subscribe(data => {
+          state$.next(data)
+        })
+
+      tickSubject.next()
+    }
   }
 }
 
-module.exports = events
+module.exports = { eventing }

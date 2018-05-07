@@ -1,70 +1,134 @@
 const events = require('./events')
-const queue = require('./queue')
+const Rx = require('rxjs')
+const testState = require('../test-state')
 
 describe('events', () => {
-  let onSpy
-  describe('onEvent()', () => {
+  describe('eventing()', () => {
+    let eventing
     beforeEach(() => {
-      onSpy = spyOn(events._emitter, 'on')
+      eventing = events.eventing()
     })
 
-    it('should call _emitter.on()', () => {
-      events.onEvent('snakeDirectionChange', () => {})
-      expect(onSpy).toHaveBeenCalled()
-    })
-
-    it('should call _emitter.on() with type as first parameter', () => {
-      events.onEvent('snakeDirectionChange', () => {})
-      expect(onSpy.calls.mostRecent().args[0]).toEqual('snakeDirectionChange')
-    })
-
-    describe('emitter.on callback', () => {
-      let onCallback
-      let callback
-      beforeEach(() => {
-        callback = jest.fn()
-        events.onEvent('snakeDirectionChange', callback)
-        onCallback = onSpy.calls.mostRecent().args[1]
+    it('should call registered callback with all queued events when flushed', done => {
+      const eventType = 'test'
+      const eventsToQueue = [
+        { type: eventType, payload: 'test1' },
+        { type: eventType, payload: 'test2' },
+        { type: eventType, payload: 'test3' },
+        { type: eventType, payload: 'test4' }
+      ]
+      const callback = jest.fn((event, state) => state)
+      eventing.onEvent(eventType, callback)
+      eventsToQueue.forEach(event => eventing.queueEvent(event))
+      const state$ = new Rx.BehaviorSubject(testState)
+      state$.take(2).subscribe({
+        complete: () => {
+          eventsToQueue.forEach(event => expect(callback).toHaveBeenCalledWith(event, testState))
+          done()
+        }
       })
+      eventing.flushEvents(state$)
+    })
 
-      it('should call given callback', () => {
-        onCallback()
-        expect(callback).toHaveBeenCalled()
+    it('should not call callback when not flushed', () => {
+      const eventType = 'test'
+      const eventsToQueue = [
+        { type: eventType, payload: 'test1' },
+        { type: eventType, payload: 'test2' },
+        { type: eventType, payload: 'test3' },
+        { type: eventType, payload: 'test4' }
+      ]
+      const callback = jest.fn((event, state) => state)
+      eventing.onEvent(eventType, callback)
+      eventsToQueue.forEach(event => eventing.queueEvent(event))
+      expect(callback).not.toHaveBeenCalled()
+    })
+
+    it('should call callback only with events of types registered with', done => {
+      const eventType = 'test'
+      const eventsToQueue = [
+        { type: eventType, payload: 'test1' },
+        { type: eventType, payload: 'test2' },
+        { type: `${eventType}1`, payload: 'test3' },
+        { type: `${eventType}1`, payload: 'test4' }
+      ]
+      const callback = jest.fn((event, state) => state)
+      eventing.onEvent(eventType, callback)
+      eventsToQueue.forEach(event => eventing.queueEvent(event))
+      const state$ = new Rx.BehaviorSubject(testState)
+      state$.take(2).subscribe({
+        complete: () => {
+          eventsToQueue
+            .filter(event => event.type === eventType)
+            .forEach(event => expect(callback).toHaveBeenCalledWith(event, testState))
+          done()
+        }
       })
+      eventing.flushEvents(state$)
+    })
 
-      it('should call given callback with passed args', () => {
-        const args = { args: 'inHere' }
-        onCallback(args)
-        expect(callback).toHaveBeenCalledWith(args)
+    it('should call callback only with events of types registered with when flushed twice', done => {
+      const eventType = 'test'
+      const eventsToQueue1 = [
+        { type: eventType, payload: 'test1' },
+        { type: eventType, payload: 'test2' },
+        { type: `${eventType}1`, payload: 'test3' },
+        { type: `${eventType}1`, payload: 'test4' }
+      ]
+      const eventsToQueue2 = [
+        { type: eventType, payload: 'test5' },
+        { type: eventType, payload: 'test6' },
+        { type: `${eventType}1`, payload: 'test7' },
+        { type: `${eventType}1`, payload: 'test8' }
+      ]
+      const callback = jest.fn((event, state) => state)
+      eventing.onEvent(eventType, callback)
+      eventsToQueue1.forEach(event => eventing.queueEvent(event))
+      eventsToQueue2.forEach(event => eventing.queueEvent(event))
+      const state$ = new Rx.BehaviorSubject(testState)
+      state$.take(3).subscribe({
+        complete: () => {
+          eventsToQueue1
+            .filter(event => event.type === eventType)
+            .forEach(event => expect(callback).toHaveBeenCalledWith(event, testState))
+          eventsToQueue2
+            .filter(event => event.type === eventType)
+            .forEach(event => expect(callback).toHaveBeenCalledWith(event, testState))
+          done()
+        }
       })
-    })
-  })
-
-  describe('queueEvent()', () => {
-    it('should call queue.queueEvent()', () => {
-      const queueEventSpy = spyOn(queue, 'queueEvent')
-      events.queueEvent()
-      expect(queueEventSpy).toHaveBeenCalled()
+      const flush1 = eventing.flushEvents(state$)
+      const flush2 = eventing.flushEvents(state$)
     })
 
-    it('should pass parameter queue.queueEvent()', () => {
-      const queueEventSpy = spyOn(queue, 'queueEvent')
-      events.queueEvent('param')
-      expect(queueEventSpy).toHaveBeenCalledWith('param')
-    })
-  })
-
-  describe('flushEvents()', () => {
-    it('should call queue.flushEvents()', () => {
-      const flushEventsSpy = spyOn(queue, 'flushEvents')
-      events.flushEvents()
-      expect(flushEventsSpy).toHaveBeenCalled()
-    })
-
-    it('should pass _emitter.emit into queue.flushEvents()', () => {
-      const flushEventsSpy = spyOn(queue, 'flushEvents')
-      events.flushEvents()
-      expect(flushEventsSpy).toHaveBeenCalledWith(events._emitter.emit)
+    it('should call callback with all events when registered * and flushed twice', done => {
+      const eventType = '*'
+      const eventsToQueue1 = [
+        { type: eventType, payload: 'test1' },
+        { type: eventType, payload: 'test2' },
+        { type: `${eventType}1`, payload: 'test3' },
+        { type: `${eventType}1`, payload: 'test4' }
+      ]
+      const eventsToQueue2 = [
+        { type: eventType, payload: 'test5' },
+        { type: eventType, payload: 'test6' },
+        { type: `${eventType}1`, payload: 'test7' },
+        { type: `${eventType}1`, payload: 'test8' }
+      ]
+      const callback = jest.fn((event, state) => state)
+      eventing.onEvent(eventType, callback)
+      eventsToQueue1.forEach(event => eventing.queueEvent(event))
+      eventsToQueue2.forEach(event => eventing.queueEvent(event))
+      const state$ = new Rx.BehaviorSubject(testState)
+      state$.take(3).subscribe({
+        complete: () => {
+          eventsToQueue1.forEach(event => expect(callback).toHaveBeenCalledWith(event, testState))
+          eventsToQueue2.forEach(event => expect(callback).toHaveBeenCalledWith(event, testState))
+          done()
+        }
+      })
+      const flush1 = eventing.flushEvents(state$)
+      const flush2 = eventing.flushEvents(state$)
     })
   })
 })

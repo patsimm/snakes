@@ -1,3 +1,4 @@
+const Immutable = require('immutable')
 const { getNextCoordinate, getSnakeById } = require('../state')
 
 const actions = {
@@ -14,7 +15,9 @@ const actions = {
     let parts = state.getIn(['snakes', snakeIndex, 'parts'])
     parts = parts.pop()
     parts = parts.unshift(
-      getNextCoordinate(state, parts.get(0), state.getIn(['snakes', snakeIndex, 'direction']))
+      Immutable.fromJS(
+        getNextCoordinate(state, parts.get(0), state.getIn(['snakes', snakeIndex, 'direction']))
+      )
     )
     state = state.setIn(['snakes', snakeIndex, 'parts'], parts)
     return state

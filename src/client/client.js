@@ -1,6 +1,7 @@
 // @ts-ignore
 require('./client.scss')
 const Immutable = require('immutable')
+const Rx = require('rxjs')
 const io = require('socket.io-client')
 const area = require('./draw/area')
 
@@ -21,6 +22,22 @@ const game = () => {
   })
   socket.on('tick', state => {
     area.drawArea(ctx, Immutable.fromJS(state))
+  })
+
+  var keyDowns = Rx.Observable.fromEvent(document, 'keydown').subscribe(e => {
+    switch (e.key) {
+      case 'ArrowUp':
+        socket.emit('changeDirection', 'north')
+        break
+      case 'ArrowDown':
+        socket.emit('changeDirection', 'south')
+        break
+      case 'ArrowRight':
+        socket.emit('changeDirection', 'east')
+        break
+      case 'ArrowLeft':
+        socket.emit('changeDirection', 'west')
+    }
   })
 }
 

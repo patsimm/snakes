@@ -1,30 +1,42 @@
-const gameEvents = require('./events')
+const e = require('./events')
 const testState = require('./test-state')
 const actions = require('./actions/actions')
+const Rx = require('rxjs')
 
-const game = {
-  loop: function(callback) {
-    callback()
-    setTimeout(() => game.loop(callback), 1000)
-  },
+const game = (initalState, stateCallback) => {
+  const eventing = e.eventing()
 
-  tick: function(state) {
-    gameEvents.flushEvents()
-    return game.performMovements(state)
-  },
+  const state$ = new Rx.BehaviorSubject(initalState)
 
-  startGame: function(state = testState, callback) {
-    game.loop(() => {
-      state = game.tick(state)
-      callback(state)
+  Rx.Observable.interval(500)
+    .do(_ => {
+      eventing.queueEvent({ type: 'TICK' })
+      eventing.flushEvents(state$)
     })
-  },
+    .publish()
+    .connect()
 
-  performMovements: function(state) {
+  eventing.onEvent('MOVE', (event, state) => {
     state.get('snakes').forEach(snake => {
       state = actions.moveSnake(state, snake.get('id'))
     })
     return state
+  })
+
+  eventing.onEvent('CHANGE_DIRECTION', (event, state) => {
+    const test = actions.changeSnakeDirection(state, event.payload.snakeId, event.payload.direction)
+    return test
+  })
+
+  state$.subscribe(state => {
+    stateCallback(state)
+    eventing.queueEvent({ type: 'MOVE' })
+  })
+
+  return {
+    fire: event => {
+      eventing.queueEvent(event)
+    }
   }
 }
 

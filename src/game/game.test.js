@@ -1,11 +1,18 @@
-const game = require('./game')
 const gameEvents = require('./events')
 const actions = require('./actions/actions')
 const testState = require('./test-state')
+const eventing = gameEvents.eventing()
 
 jest.useFakeTimers()
 
 describe('game', () => {
+  let game
+
+  beforeEach(() => {
+    spyOn(gameEvents, 'eventing').and.returnValue(eventing)
+    game = require('./game')
+  })
+
   describe('loop()', () => {
     it('should call setTimeout', () => {
       game.loop(() => {})
@@ -29,7 +36,7 @@ describe('game', () => {
 
   describe('tick()', () => {
     it('should flush queue', () => {
-      const flushSpy = spyOn(gameEvents, 'flushEvents')
+      const flushSpy = spyOn(eventing, 'flushEvents')
       game.tick(testState)
       expect(flushSpy).toHaveBeenCalled()
     })
