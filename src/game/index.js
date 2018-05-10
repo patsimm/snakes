@@ -1,3 +1,8 @@
-require('./game')()
+const createGame = require('./game')
+const { eventCreators, eventTypes } = require('./events')
 
-console.log('test')
+module.exports = {
+  createGame,
+  eventTypes,
+  eventCreators
+}

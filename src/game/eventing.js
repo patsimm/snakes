@@ -1,7 +1,7 @@
 const EventEmitter = require('events').EventEmitter
 const Rx = require('rxjs')
 
-const eventing = stateSubject => {
+const startEventing = () => {
   const eventSubject = new Rx.Subject()
   const eventListenerSubject = new Rx.Subject()
   const accumulatedListeners = eventListenerSubject
@@ -54,4 +54,4 @@ const eventing = stateSubject => {
   }
 }
 
-module.exports = { eventing }
+module.exports = { startEventing }

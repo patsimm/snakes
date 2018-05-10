@@ -2,16 +2,26 @@ const path = require('path')
 const app = require('express')()
 const http = require('http').createServer(app)
 const io = require('socket.io')(http)
-const testState = require('../game/test-state')
+const randomcolor = require('randomcolor')
+const { createGame, eventCreators } = require('../game')
 
-const game = require('../game/game')(testState, state => {
+let totalConns = 0
+
+const game = createGame(state => {
   io.sockets.emit('tick', state.toJS())
 })
 
 io.sockets.on('connection', socket => {
-  socket.emit('connect', testState.toJS())
+  totalConns = totalConns + 1
+  const snakeId = totalConns
+  game.fire(eventCreators.spawnSnake(snakeId, randomcolor()))
+
   socket.on('changeDirection', direction => {
-    game.fire({ type: 'CHANGE_DIRECTION', payload: { direction, snakeId: 1 } })
+    game.fire(eventCreators.changeDirection(snakeId, direction))
+  })
+
+  socket.on('disconnect', () => {
+    game.fire(eventCreators.removeSnake(snakeId))
   })
 })
 

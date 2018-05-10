@@ -1,5 +1,6 @@
 const snakeData = require('./snake.data')
 const Immutable = require('immutable')
+const directions = require('../data')
 
 describe('snake.data', () => {
   describe('createSnake()', () => {
@@ -19,12 +20,12 @@ describe('snake.data', () => {
     })
 
     it('should set direction', () => {
-      const result = snakeData.createSnake(1, 'red', 'north')
-      expect(result.get('direction')).toEqual('north')
+      const result = snakeData.createSnake(1, 'red', directions.NORTH)
+      expect(result.get('direction')).toEqual(directions.NORTH)
     })
 
     it('should set parts if given as array', () => {
-      const result = snakeData.createSnake(1, 'red', 'north', [
+      const result = snakeData.createSnake(1, 'red', directions.NORTH, [
         { x: 5, y: 5 },
         { x: 6, y: 5 },
         { x: 7, y: 5 }
@@ -33,7 +34,7 @@ describe('snake.data', () => {
     })
 
     it('should set parts if given as arry with Immutables', () => {
-      const result = snakeData.createSnake(1, 'red', 'north', [
+      const result = snakeData.createSnake(1, 'red', directions.NORTH, [
         Immutable.Map({ x: 5, y: 5 }),
         Immutable.Map({ x: 6, y: 5 }),
         Immutable.Map({ x: 7, y: 5 })
@@ -45,7 +46,7 @@ describe('snake.data', () => {
       const result = snakeData.createSnake(
         1,
         'red',
-        'north',
+        directions.NORTH,
         Immutable.fromJS([{ x: 5, y: 5 }, { x: 6, y: 5 }, { x: 7, y: 5 }])
       )
       expect(result.get('parts').toJS()).toEqual([{ x: 5, y: 5 }, { x: 6, y: 5 }, { x: 7, y: 5 }])

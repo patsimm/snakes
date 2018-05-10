@@ -1,47 +1,48 @@
 const actions = require('./actions')
 const testState = require('../test-state')
 const { getSnakeById, getNextCoordinate } = require('../state')
+const { directions } = require('../data')
 
 describe('actions', () => {
   describe('changeSnakeDirection', () => {
     it('should not return same state', () => {
-      const result = actions.changeSnakeDirection(testState, 4, 'east')
+      const result = actions.changeSnakeDirection(testState, 4, directions.NORTH)
       expect(result).not.toBe(testState)
     })
 
     it('should return same state if snake does not exist', () => {
-      const result = actions.changeSnakeDirection(testState, 100, 'west')
+      const result = actions.changeSnakeDirection(testState, 100, directions.WEST)
       expect(result).toBe(testState)
     })
 
-    it('should set snakes direction to east', () => {
-      const result = actions.changeSnakeDirection(testState, 4, 'east')
+    it('should set snakes direction to north', () => {
+      const result = actions.changeSnakeDirection(testState, 4, directions.NORTH)
       const resultSnake = getSnakeById(result, 4)
-      expect(resultSnake.get('direction')).toEqual('east')
+      expect(resultSnake.get('direction')).toEqual(directions.NORTH)
     })
 
     it('should set snakes direction to north', () => {
-      const result = actions.changeSnakeDirection(testState, 4, 'north')
+      const result = actions.changeSnakeDirection(testState, 4, directions.NORTH)
       const resultSnake = getSnakeById(result, 4)
-      expect(resultSnake.get('direction')).toEqual('north')
+      expect(resultSnake.get('direction')).toEqual(directions.NORTH)
     })
 
     it('should not return the same snakes array', () => {
-      const result = actions.changeSnakeDirection(testState, 4, 'north')
+      const result = actions.changeSnakeDirection(testState, 4, directions.NORTH)
       expect(result.get('snakes')).not.toBe(testState.get('snakes'))
     })
 
     it('should not return the same snake object', () => {
       const snakeBefore = getSnakeById(testState, 4).toJS()
-      const result = actions.changeSnakeDirection(testState, 4, 'north')
+      const result = actions.changeSnakeDirection(testState, 4, directions.NORTH)
       const resultSnake = getSnakeById(result, 4).toJS()
       expect(resultSnake).not.toBe(snakeBefore)
     })
 
     it('should set other snakes direction to west', () => {
-      const result = actions.changeSnakeDirection(testState, 1, 'west')
+      const result = actions.changeSnakeDirection(testState, 1, directions.WEST)
       const resultSnake = getSnakeById(result, 1).toJS()
-      expect(resultSnake.direction).toEqual('west')
+      expect(resultSnake.direction).toEqual(directions.WEST)
     })
   })
 
@@ -57,7 +58,7 @@ describe('actions', () => {
     })
 
     it('should not return the same snakes array', () => {
-      const result = actions.changeSnakeDirection(testState, 4, 'north')
+      const result = actions.changeSnakeDirection(testState, 4, directions.NORTH)
       expect(result.get('snakes')).not.toEqual(testState.get('snakes'))
     })
 

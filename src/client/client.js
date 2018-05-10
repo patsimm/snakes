@@ -4,6 +4,7 @@ const Immutable = require('immutable')
 const Rx = require('rxjs')
 const io = require('socket.io-client')
 const area = require('./draw/area')
+const { directions } = require('../game/data')
 
 const game = () => {
   const appDiv = document.getElementById('app')
@@ -17,26 +18,23 @@ const game = () => {
   const ctx = canvas.getContext('2d')
 
   const socket = io.connect(`:${process.env.PORT}`)
-  socket.on('connect', args => {
-    console.log('connected')
-  })
   socket.on('tick', state => {
     area.drawArea(ctx, Immutable.fromJS(state))
   })
 
   var keyDowns = Rx.Observable.fromEvent(document, 'keydown').subscribe(e => {
-    switch (e.key) {
-      case 'ArrowUp':
-        socket.emit('changeDirection', 'north')
+    switch (e.key.toUpperCase()) {
+      case 'W':
+        socket.emit('changeDirection', directions.NORTH)
         break
-      case 'ArrowDown':
-        socket.emit('changeDirection', 'south')
+      case 'S':
+        socket.emit('changeDirection', directions.SOUTH)
         break
-      case 'ArrowRight':
-        socket.emit('changeDirection', 'east')
+      case 'D':
+        socket.emit('changeDirection', directions.EAST)
         break
-      case 'ArrowLeft':
-        socket.emit('changeDirection', 'west')
+      case 'A':
+        socket.emit('changeDirection', directions.WEST)
     }
   })
 }

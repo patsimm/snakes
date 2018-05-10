@@ -1,5 +1,7 @@
-const events = require('./events')
+const types = require('./types')
+const creators = require('./creators')
 
 module.exports = {
-  eventing: events.eventing
+  eventCreators: creators,
+  eventTypes: types
 }

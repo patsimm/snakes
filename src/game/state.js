@@ -1,8 +1,13 @@
+const { createArea } = require('./data')
 const Immutable = require('immutable')
 const testState = require('./test-state')
+const { directions } = require('./data')
 
 const state = {
-  initialState: testState,
+  initialState: Immutable.Map({
+    area: createArea(20, 20),
+    snakes: Immutable.List([])
+  }),
 
   getSnakeById: (s, id) => {
     const snakeIndex = s.get('snakes').findIndex(snake => snake.get('id') === id)
@@ -35,13 +40,13 @@ const state = {
     const realMod = (u, v) => (u % v + v) % v
 
     switch (direction) {
-      case 'north':
+      case directions.NORTH:
         return { x, y: realMod(y - 1, height) }
-      case 'east':
+      case directions.EAST:
         return { x: realMod(x + 1, width), y }
-      case 'south':
+      case directions.SOUTH:
         return { x, y: realMod(y + 1, height) }
-      case 'west':
+      case directions.WEST:
         return { x: realMod(x - 1, width), y }
       default:
         return undefined

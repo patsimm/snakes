@@ -1,12 +1,12 @@
-const events = require('./events')
+const { startEventing } = require('./eventing')
 const Rx = require('rxjs')
-const testState = require('../test-state')
+const testState = require('./test-state')
 
 describe('events', () => {
   describe('eventing()', () => {
     let eventing
     beforeEach(() => {
-      eventing = events.eventing()
+      eventing = startEventing()
     })
 
     it('should call registered callback with all queued events when flushed', done => {
